@@ -1,35 +1,48 @@
 package com.foodie.server.controller;
 
+import com.foodie.server.service.ImageService;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
+@Slf4j
 @RestController
-@RequestMapping("api/")
+@RequestMapping("api/images")
 public class ImageController {
 
-    @Value("${foodie.storage.images}")
-    private String imagePath;
+    @Autowired
+    private ImageService imageService;
 
-    @GetMapping("/images/{user}/{image}")
+    @GetMapping(
+            value = "/{user}/{image}",
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
     @ResponseBody
     public ResponseEntity<InputStreamResource> getImage(
             @PathVariable("user") @NotBlank String user,
             @PathVariable("image") @NotBlank String image) {
 
-        String path = String.format("%s/%s/%s", imagePath, user, image);
-        InputStream resource = getClass().getResourceAsStream(path);
-        if (resource == null) {
-            return ResponseEntity.badRequest().build();
-        } else {
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_PNG)
-                    .body(new InputStreamResource(resource));
-        }
+        InputStream resource = imageService.downloadImage(user, image);
+        return resource == null ?
+                ResponseEntity.badRequest().build() :
+                ResponseEntity.ok().body(new InputStreamResource(resource));
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<Void> postImage(@RequestParam("image") MultipartFile file) {
+        // TODO: get Author from JWT
+        String author = "default";
+
+        imageService.uploadImage(file, author);
+
+        // TODO: return file name (change file name before and return it)
+        return ResponseEntity.ok().build();
     }
 }
