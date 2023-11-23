@@ -15,7 +15,7 @@ public class UserDto {
     private String email;
 
     @NotBlank(message = "Username required")
-    @JsonAlias(value = {"name", "nickname", "user"})
+    @JsonAlias(value = {"name", "nickname", "user", "login"})
     private String username;
 
     @NotBlank(message = "Password required")
