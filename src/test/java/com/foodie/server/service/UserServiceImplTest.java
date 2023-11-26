@@ -14,7 +14,7 @@ class UserServiceImplTest {
     @Autowired
     private UserService userService;
 
-    private final static UserDto dto = new UserDto("test1@mail.com", "name", "password");
+    private final static UserDto dto = new UserDto( "name", "password");
 
     @Test
     void registerUser() {

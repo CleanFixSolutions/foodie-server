@@ -1,10 +1,7 @@
 package com.foodie.server.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 
 @Entity
 @Table(name = "recipes")
@@ -17,12 +14,17 @@ public class RecipeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "recipe")
-    String recipeBlocksJson;
+    @Column(name = "recipeJson")
+    private String recipeBlocksJson;
 
 //    @ManyToOne
 //    UserEntity userEntity;
 
-    String Author;
+    @Column(name = "author")
+    private String author;
 
+    public RecipeEntity(String recipeBlocksJson, String author) {
+        this.recipeBlocksJson = recipeBlocksJson;
+        this.author = author;
+    }
 }

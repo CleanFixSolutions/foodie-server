@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 public class RecipeBlockDto {
 
     @NotNull(message = "Should be TEXT or IMAGE")
-    RecipeBlockType blockType;
+    private RecipeBlockType blockType;
 
     /**
      * if blockType == TEXT then contains block of text
      * if blockType == IMAGE then contains name of image
      */
     @NotBlank(message = "Content can't be blank")
-    String content;
+    private String content;
 
 }

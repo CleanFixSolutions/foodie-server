@@ -6,7 +6,6 @@ import com.foodie.server.model.entity.RecipeEntity;
 import com.foodie.server.repository.RecipeRepository;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +20,12 @@ public class RecipeServiceImpl implements RecipeService {
     @Autowired
     RecipeRepository recipeRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
-
     private final Gson gson = new Gson();
 
     @Override
     public void createRecipe(RecipeDto recipeDto) {
         String jsonContext = gson.toJson(recipeDto.getRecipeBlockDtoList());
-        RecipeEntity recipeEntity = new RecipeEntity(recipeRepository.count() + 1, jsonContext, recipeDto.getAuthor());
+        RecipeEntity recipeEntity = new RecipeEntity(jsonContext, recipeDto.getAuthor());
         recipeRepository.save(recipeEntity);
     }
 

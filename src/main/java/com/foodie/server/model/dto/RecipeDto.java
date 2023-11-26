@@ -14,8 +14,8 @@ import java.util.List;
 public class RecipeDto {
 
     @NotEmpty
-    List<@Valid RecipeBlockDto> recipeBlockDtoList;
+    private List<@Valid RecipeBlockDto> recipeBlockDtoList;
 
-    String Author;
+    private String Author;
 
 }

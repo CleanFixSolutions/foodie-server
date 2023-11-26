@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDto {
 
-    @NotBlank(message = "Email required")
-    private String email;
+//    @NotBlank(message = "Email required")
+//    private String email;
 
     @NotBlank(message = "Username required")
     @JsonAlias(value = {"name", "nickname", "user", "login"})
