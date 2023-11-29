@@ -8,6 +8,8 @@ public interface UserService {
 
     void registerUser(UserDto userDto);
 
+    String login(UserDto userDto);
+
     List<UserDto> getUsers();
 
 }

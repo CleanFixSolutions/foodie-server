@@ -1,9 +1,8 @@
 package com.foodie.server.service;
 
-import com.foodie.server.exception.custom.FIleUploadException;
+import com.foodie.server.exception.custom.FileUploadClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +30,7 @@ public class ImageServiceImpl implements ImageService {
 
         // Check received file
         if (file.isEmpty()) {
-            throw new FIleUploadException("Check uploaded file", HttpStatus.BAD_REQUEST);
+            throw new FileUploadClientException("Uploaded file is empty");
         }
 
         // Check if Image directory exist
@@ -56,12 +55,12 @@ public class ImageServiceImpl implements ImageService {
         // Check if File in this directory exist
         if (destinationFile.exists()) {
             log.info("This file already exist");
-//            throw new FIleUploadException("This file already exist", HttpStatus.BAD_REQUEST);
+//            throw new FileUploadClientException("This file already exist", HttpStatus.BAD_REQUEST);
         }
         try {
             file.transferTo(destinationFile);
         } catch (IOException e) {
-            throw new FIleUploadException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new FileUploadClientException(e.getMessage());
         }
 
         // todo: save meta info in db and return as DTO

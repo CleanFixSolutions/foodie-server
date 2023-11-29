@@ -4,12 +4,12 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class FIleUploadException extends RuntimeException {
+public class CustomClientException extends RuntimeException {
 
     private final HttpStatus status;
 
-    public FIleUploadException(String message, HttpStatus status) {
+    public CustomClientException(String message) {
         super(message);
-        this.status = status;
+        this.status = HttpStatus.BAD_REQUEST;
     }
 }
