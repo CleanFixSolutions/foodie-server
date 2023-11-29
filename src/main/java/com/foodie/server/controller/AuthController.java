@@ -1,11 +1,13 @@
 package com.foodie.server.controller;
 
+import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.dto.UserDto;
 import com.foodie.server.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,15 +23,18 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerUser(@Valid @RequestBody UserDto registerDto) {
-        userService.registerUser(registerDto);
-        return ResponseEntity.ok(null);
+    public ResponseEntity<JwtDto> registerUser(@Valid @RequestBody UserDto registerDto) {
+        return ResponseEntity.ok(userService.registerUser(registerDto));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserDto loginDto) {
-        String jwt = userService.login(loginDto);
-        return new ResponseEntity<>(jwt, HttpStatus.OK);
+    public ResponseEntity<JwtDto> login(@Valid @RequestBody UserDto loginDto) {
+        return ResponseEntity.ok(userService.login(loginDto));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<JwtDto> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(userService.refreshToken(request, response));
     }
 
 }

@@ -1,5 +1,7 @@
 package com.foodie.server.service;
 
+import com.foodie.server.config.security.jwt.JwtService;
+import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.dto.UserDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,10 @@ class UserServiceImplTest {
     @Autowired
     private UserService userService;
 
-    private final static UserDto dto = new UserDto( "name", "password");
+    @Autowired
+    private JwtService jwtService;
+
+    private final static UserDto dto = new UserDto("name", "password");
 
     @Test
     void registerUser() {
@@ -30,5 +35,20 @@ class UserServiceImplTest {
         Assertions.assertEquals(1, userService.getUsers().size());
         Assertions.assertThrows(Exception.class, () -> userService.registerUser(dto));
         Assertions.assertEquals(1, userService.getUsers().size());
+    }
+
+    @Test
+    void checkUsernameFromRegistrationToken() {
+        JwtDto jwtDto = userService.registerUser(dto);
+        Assertions.assertEquals(dto.getUsername(), jwtService.extractUsername(jwtDto.getAccessToken()));
+        Assertions.assertEquals(dto.getUsername(), jwtService.extractUsername(jwtDto.getRefreshToken()));
+    }
+
+    @Test
+    void checkUsernameFromAuthToken() {
+        userService.registerUser(dto);
+        JwtDto jwtDto = userService.login(dto);
+        Assertions.assertEquals(dto.getUsername(), jwtService.extractUsername(jwtDto.getAccessToken()));
+        Assertions.assertEquals(dto.getUsername(), jwtService.extractUsername(jwtDto.getRefreshToken()));
     }
 }

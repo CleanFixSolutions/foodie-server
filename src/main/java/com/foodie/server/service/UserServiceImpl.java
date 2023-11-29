@@ -1,10 +1,14 @@
 package com.foodie.server.service;
 
 import com.foodie.server.config.security.jwt.JwtService;
+import com.foodie.server.exception.custom.JwtNotFoundException;
 import com.foodie.server.exception.custom.UserNotFoundClientException;
+import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.dto.UserDto;
 import com.foodie.server.model.entity.UserEntity;
 import com.foodie.server.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -32,22 +36,43 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public void registerUser(UserDto userDto) {
+    public JwtDto registerUser(UserDto userDto) {
         UserEntity entity = modelMapper.map(userDto, UserEntity.class);
         entity.setPassword(passwordEncoder.encode((entity.getPassword())));
         userRepository.save(entity);
+        return JwtDto.builder()
+                .accessToken(jwtService.generateToken(entity))
+                .refreshToken(jwtService.generateRefreshToken(entity))
+                .build();
     }
 
     @Override
-    public String login(UserDto userDto) {
+    public JwtDto login(UserDto userDto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
         UserEntity user = userRepository.findByUsername(userDto.getUsername())
                 .orElseThrow(() -> new UserNotFoundClientException(userDto.getUsername()));
-        final String jwtToken = jwtService.generateToken(user);
-        final String refreshToken = jwtService.generateRefreshToken(user);
-        // todo: return jwtDto
-        return jwtToken;
+        return JwtDto.builder()
+                .accessToken(jwtService.generateToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
+                .build();
+    }
+
+    @Override
+    public JwtDto refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        final String jwt = jwtService.extractJwt(request);
+        if (jwt == null) {
+            throw new JwtNotFoundException();
+        }
+        final String username = jwtService.extractUsername(jwt);
+
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundClientException(username));
+
+        return JwtDto.builder()
+                .accessToken(jwtService.generateToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
+                .build();
     }
 
     @Override
