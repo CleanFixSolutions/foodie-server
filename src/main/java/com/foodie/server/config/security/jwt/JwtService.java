@@ -48,15 +48,11 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public String generateToken(
-            UserDetails userDetails
-    ) {
+    public String generateToken(UserDetails userDetails) {
         return buildToken(userDetails, JWT_EXPIRATION);
     }
 
-    public String generateRefreshToken(
-            UserDetails userDetails
-    ) {
+    public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(userDetails, JWT_REFRESH_EXPIRATION);
     }
 

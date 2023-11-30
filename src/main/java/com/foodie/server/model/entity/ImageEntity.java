@@ -6,26 +6,29 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
+
 @Entity
-@Table(name = "recipes")
+@Table(name = "images")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecipeEntity {
+public class ImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
-    @Column(name = "recipeJson")
-    private String recipeBlocksJson;
-
     @Column(name = "author")
     private String author;
 
+    private String path;
+
+    @Column(name = "image_name")
+    private String imageName;
+
+    @Column(name = "upload_time")
+    private Date uploadTime;
 }

@@ -1,41 +1,50 @@
 package com.foodie.server.service;
 
-import com.foodie.server.model.dto.RecipeBlockDto;
+import com.foodie.server.exception.custom.UserNotFoundClientException;
 import com.foodie.server.model.dto.RecipeDto;
 import com.foodie.server.model.entity.RecipeEntity;
+import com.foodie.server.model.entity.UserEntity;
 import com.foodie.server.repository.RecipeRepository;
+import com.foodie.server.repository.UserRepository;
 import com.google.gson.Gson;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RecipeServiceImpl implements RecipeService {
 
-    @Autowired
-    RecipeRepository recipeRepository;
+    private final RecipeRepository recipeRepository;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     private final Gson gson = new Gson();
 
     @Override
     public void createRecipe(RecipeDto recipeDto) {
         String jsonContext = gson.toJson(recipeDto.getRecipeBlockDtoList());
-        RecipeEntity recipeEntity = new RecipeEntity(jsonContext, recipeDto.getAuthor());
+
+        UserEntity user = userRepository.findByUsername(recipeDto.getAuthor())
+                .orElseThrow(() -> new UserNotFoundClientException(recipeDto.getAuthor()));
+
+        RecipeEntity recipeEntity = RecipeEntity.builder()
+                .recipeBlocksJson(jsonContext)
+                .author(recipeDto.getAuthor())
+                .user(user)
+                .build();
         recipeRepository.save(recipeEntity);
     }
 
     @Override
     public List<RecipeDto> getAllRecipes() {
-        List<RecipeDto> list = new ArrayList<>();
-        for (var i : recipeRepository.findAll()) {
-            RecipeBlockDto[] recipeBlockDtos = gson.fromJson(i.getRecipeBlocksJson(), RecipeBlockDto[].class);
-            list.add(new RecipeDto(List.of(recipeBlockDtos), i.getAuthor()));
-        }
-        return list;
+        return recipeRepository.findAll().stream()
+                .map(entity -> modelMapper.map(entity, RecipeDto.class))
+                .toList();
     }
 }

@@ -4,6 +4,7 @@ import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.exception.custom.JwtNotFoundException;
 import com.foodie.server.exception.custom.UserNotFoundClientException;
 import com.foodie.server.model.dto.JwtDto;
+import com.foodie.server.model.dto.RecipeDto;
 import com.foodie.server.model.dto.UserDto;
 import com.foodie.server.model.entity.UserEntity;
 import com.foodie.server.repository.UserRepository;
@@ -18,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -75,9 +75,17 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    public List<RecipeDto> getRecipesByUsername(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundClientException(username));
+        return user.getRecipes().stream()
+                .map(recipe -> modelMapper.map(recipe, RecipeDto.class))
+                .toList();
+    }
+
     @Override
     public List<UserDto> getUsers() {
-        return StreamSupport.stream(userRepository.findAll().spliterator(), false)
+        return userRepository.findAll().stream()
                 .map(e -> modelMapper.map(e, UserDto.class))
                 .toList();
     }

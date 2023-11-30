@@ -4,9 +4,10 @@ package com.foodie.server.controller;
 import com.foodie.server.model.dto.RecipeDto;
 import com.foodie.server.service.RecipeService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,14 +15,14 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/recipe")
+@RequiredArgsConstructor
 public class RecipeController {
 
-    @Autowired
-    RecipeService recipeService;
+    private final RecipeService recipeService;
 
     @PostMapping()
-    public ResponseEntity<Void> createRecipe(@Valid @RequestBody RecipeDto recipeDto) {
-        // TODO: add author from JWT
+    public ResponseEntity<Void> createRecipe(@Valid @RequestBody RecipeDto recipeDto, Authentication authentication) {
+        recipeDto.setAuthor(authentication.getName());
         recipeService.createRecipe(recipeDto);
         return ResponseEntity.ok(null);
     }
