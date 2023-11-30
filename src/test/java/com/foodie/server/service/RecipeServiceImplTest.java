@@ -3,7 +3,9 @@ package com.foodie.server.service;
 import com.foodie.server.model.RecipeBlockType;
 import com.foodie.server.model.dto.RecipeBlockDto;
 import com.foodie.server.model.dto.RecipeDto;
+import com.foodie.server.model.dto.UserDto;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,10 +18,22 @@ import java.util.List;
 class RecipeServiceImplTest {
 
     @Autowired
-    RecipeService recipeService;
+    private RecipeService recipeService;
 
+    @Autowired
+    private UserService userService;
+
+    private final static UserDto USER_DTO = new UserDto("name", "password");
     private static final RecipeBlockDto recipeBlock = new RecipeBlockDto(RecipeBlockType.TEXT, "Text");
-    private static final RecipeDto RECIPE_DTO = new RecipeDto(List.of(recipeBlock), "Test");
+    private static final RecipeDto RECIPE_DTO = RecipeDto.builder()
+            .recipeBlockDtoList(List.of(recipeBlock))
+            .author(USER_DTO.getUsername())
+            .build();
+
+    @BeforeEach
+    void init() {
+        userService.registerUser(USER_DTO);
+    }
 
     @Test
     void createRecipe() {
