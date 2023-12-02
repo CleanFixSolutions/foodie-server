@@ -1,5 +1,6 @@
 package com.foodie.server.config.security.jwt;
 
+import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -16,15 +17,68 @@ class JwtServiceTest {
     @Autowired
     private JwtService jwtService;
 
-    private final static UserEntity USER_ENTITY = UserEntity.builder()
-            .username("TEST_USER")
-            .password("TEST_PASSWORD")
-            .build();
+    private static final String USERNAME_1 = "TEST_USER";
+
+//    private final static UserEntity USER_ENTITY_1 = UserEntity.builder()
+//            .username(USERNAME_1)
+//            .password("TEST_PASSWORD")
+//            .build();
 
     @Test
     void generateToken() {
-        String token = jwtService.generateToken(USER_ENTITY);
+        String token = jwtService.generateAccessToken(USERNAME_1);
         String jwtUser = jwtService.extractUsername(token);
-        Assertions.assertEquals(USER_ENTITY.getUsername(), jwtUser);
+        Assertions.assertEquals(USERNAME_1, jwtUser);
     }
+
+    @Test
+    void validateAccessToken() {
+        String token = jwtService.generateAccessToken(USERNAME_1);
+        Assertions.assertTrue(jwtService.isTokenValid(token, USERNAME_1));
+        Assertions.assertFalse(jwtService.isTokenValid(token, USERNAME_1 + "text"));
+    }
+
+    @Test
+    void validateRefreshToken() {
+        String token = jwtService.generateRefreshToken(USERNAME_1);
+        Assertions.assertTrue(jwtService.isTokenValid(token, USERNAME_1));
+        Assertions.assertFalse(jwtService.isTokenValid(token, USERNAME_1 + "text"));
+    }
+
+    @Test
+    void refreshTokens() {
+        String refreshToken = jwtService.generateRefreshToken(USERNAME_1);
+        JwtDto refreshedTokens = jwtService.refreshTokens("Bearer " + refreshToken);
+
+        Assertions.assertTrue(jwtService.isTokenValid(refreshedTokens.getAccessToken(), USERNAME_1));
+        Assertions.assertFalse(jwtService.isTokenValid(refreshedTokens.getAccessToken(), USERNAME_1 + "text"));
+    }
+
+    @Test
+    void extractJwtFromHeader() {
+        final String accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJURVNUX1VTRVIiLCJpYXQiOjE3MDE1MTE1MTgsImV4cCI6MTcwMTU5NzkxOH0._-BD2fu5woTLfyny8og5R4ZEFgpuymu4l1_fBgjhXe4";
+        final String refreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJURVNUX1VTRVIiLCJpYXQiOjE3MDE1MTE1MTgsImV4cCI6MTcwMjExNjMxOH0.YR1cC6CzyRwnAaxjTHStcLyz7J6dflrVP0ffuBYCrAQ";
+
+        Assertions.assertEquals(accessToken, jwtService.extractJwt("Bearer " + accessToken));
+        Assertions.assertEquals(refreshToken, jwtService.extractJwt("Bearer " + refreshToken));
+    }
+
+    @Test
+    void extractGeneratedJwtFromHeader() {
+        String accessToken = jwtService.generateAccessToken(USERNAME_1);
+        String refreshToken = jwtService.generateRefreshToken(USERNAME_1);
+
+        Assertions.assertEquals(accessToken, jwtService.extractJwt("Bearer " + accessToken));
+        Assertions.assertEquals(refreshToken, jwtService.extractJwt("Bearer " + refreshToken));
+    }
+
+    @Test
+    void extractUsernameFromJwt() {
+        String accessToken = jwtService.generateAccessToken(USERNAME_1);
+        String refreshToken = jwtService.generateRefreshToken(USERNAME_1);
+
+        Assertions.assertEquals(USERNAME_1, jwtService.extractUsername( accessToken));
+        Assertions.assertEquals(USERNAME_1, jwtService.extractUsername( refreshToken));
+    }
+
 }

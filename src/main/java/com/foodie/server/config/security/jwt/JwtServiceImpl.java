@@ -7,11 +7,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -33,33 +30,14 @@ public class JwtServiceImpl implements JwtService {
     @Value("${foodie.jwt.secret}")
     private String JWT_SECRET;
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
-
-
     @Override
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    @Deprecated
-    @Override
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(userDetails.getUsername());
-    }
-
-    @Deprecated
-    @Override
-    public String generateRefreshToken(UserDetails userDetails) {
-        return generateRefreshToken(userDetails.getUsername());
+    public boolean isTokenValid(String token, String expectedUsername) {
+        return extractUsername(token).equals(expectedUsername) && !extractExpiration(token).before(new Date());
     }
 
     @Override
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
         return buildToken(username, JWT_EXPIRATION);
-
     }
 
     @Override
@@ -68,40 +46,44 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public JwtDto refreshTokens(String refreshToken) {
-        if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
+    public JwtDto refreshTokens(String authorizationHeader) {
+        final String jwt = extractJwt(authorizationHeader);
+        if (jwt == null) {
             throw new JwtNotFoundException();
         }
-        final String jwt = refreshToken.substring(7);
         final String username = extractUsername(jwt);
 
         return JwtDto.builder()
-                .accessToken(generateToken(username))
+                .accessToken(generateAccessToken(username))
                 .refreshToken(generateRefreshToken(username))
                 .build();
     }
 
-    public String extractJwt(HttpServletRequest request) {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    @Override
+    public String extractJwt(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return null;
         }
-        return authHeader.substring(7);
+        return authorizationHeader.substring(7);
     }
 
-//    private String buildToken(UserDetails userDetails, long expiration) {
-//        String username = userDetails.getUsername();
-//        Date currentDate = Date.from(Instant.now());
-//        Date expireDate = Date.from(Instant.now().plus(expiration, ChronoUnit.SECONDS));
-//
-//        return Jwts.builder()
-//                .setSubject(username)
-//                .setIssuedAt(currentDate)
-//                .setExpiration(expireDate)
-//                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
+    @Override
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
 
+    @Override
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    /**
+     * Builds a JSON Web Token (JWT) with the specified username and expiration time.
+     *
+     * @param username   The subject (username) to be included in the token.
+     * @param expiration The duration in seconds for which the token will be valid.
+     * @return The constructed JWT as a compact serialized string.
+     */
     private String buildToken(final String username, final long expiration) {
         return Jwts.builder()
                 .setSubject(username)
@@ -111,19 +93,19 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    /**
+     * Extracts a specific claim from a given JWT token using the provided claims resolver.
+     *
+     * @param token          The JWT token from which to extract the claim.
+     * @param claimsResolver The function to resolve the desired claim from the JWT's body.
+     * @param <T>            The type of the extracted claim.
+     * @return The extracted claim.
+     */
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts
                 .parserBuilder()
