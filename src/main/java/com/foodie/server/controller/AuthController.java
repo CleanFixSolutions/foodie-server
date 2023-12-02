@@ -1,18 +1,15 @@
 package com.foodie.server.controller;
 
+import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.dto.UserDto;
 import com.foodie.server.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<JwtDto> registerUser(@Valid @RequestBody UserDto registerDto) {
@@ -32,9 +30,15 @@ public class AuthController {
         return ResponseEntity.ok(userService.login(loginDto));
     }
 
+
     @PostMapping("/refresh-token")
-    public ResponseEntity<JwtDto> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        return ResponseEntity.ok(userService.refreshToken(request, response));
+    public ResponseEntity<JwtDto> refreshToken(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken) {
+        return ResponseEntity.ok(jwtService.refreshTokens(refreshToken));
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("hello world!");
+    }
 }

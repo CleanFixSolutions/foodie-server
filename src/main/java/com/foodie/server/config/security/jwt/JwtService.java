@@ -1,95 +1,27 @@
 package com.foodie.server.config.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import com.foodie.server.model.dto.JwtDto;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.function.Function;
-
-@Slf4j
 @Component
-public class JwtService {
+public interface JwtService {
 
-    @Value("${foodie.jwt.expiration}")
-    private long JWT_EXPIRATION;
+    boolean isTokenValid(String token, UserDetails userDetails);
 
-    @Value("${foodie.jwt.refresh-expiration}")
-    private long JWT_REFRESH_EXPIRATION;
+    String extractUsername(String token);
 
-    @Value("${foodie.jwt.secret}")
-    private String JWT_SECRET;
+    String generateToken(UserDetails userDetails);
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
+    String generateToken(String username);
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
+    String generateRefreshToken(UserDetails userDetails);
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
+    String generateRefreshToken(String username);
 
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
+    JwtDto refreshTokens(String refreshToken);
 
-    public String generateToken(UserDetails userDetails) {
-        return buildToken(userDetails, JWT_EXPIRATION);
-    }
+    String extractJwt(HttpServletRequest request);
 
-    public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(userDetails, JWT_REFRESH_EXPIRATION);
-    }
-
-    public String extractJwt(HttpServletRequest request) {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        return authHeader.substring(7);
-    }
-
-    private String buildToken(UserDetails userDetails, long expiration) {
-        String username = userDetails.getUsername();
-        Date currentDate = Date.from(Instant.now());
-        Date expireDate = Date.from(Instant.now().plus(expiration, ChronoUnit.SECONDS));
-
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(currentDate)
-                .setExpiration(expireDate)
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = Jwts
-                .parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claimsResolver.apply(claims);
-    }
 }

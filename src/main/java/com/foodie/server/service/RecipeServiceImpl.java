@@ -23,8 +23,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
     @Override
     public void createRecipe(RecipeDto recipeDto) {
