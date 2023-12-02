@@ -2,11 +2,9 @@ package com.foodie.server.config.security.jwt;
 
 import com.foodie.server.exception.custom.JwtNotFoundException;
 import com.foodie.server.model.dto.JwtDto;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Component
 public interface JwtService {
     /**
      * Generates an access token for the given username using JSON Web Tokens (JWT).

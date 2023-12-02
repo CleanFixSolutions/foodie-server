@@ -25,7 +25,4 @@ public class RecipeEntity {
     @Column(name = "recipeJson")
     private String recipeBlocksJson;
 
-    @Column(name = "author")
-    private String author;
-
 }

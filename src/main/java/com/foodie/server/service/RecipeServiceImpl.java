@@ -34,7 +34,6 @@ public class RecipeServiceImpl implements RecipeService {
 
         RecipeEntity recipeEntity = RecipeEntity.builder()
                 .recipeBlocksJson(jsonContext)
-                .author(recipeDto.getAuthor())
                 .user(user)
                 .build();
         recipeRepository.save(recipeEntity);

@@ -1,5 +1,6 @@
 package com.foodie.server.exception;
 
+import com.foodie.server.exception.custom.CustomClientException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,10 @@ public class ExceptionHandler {
                 .path(req.getContextPath() + req.getServletPath())
                 .message(e.getLocalizedMessage());
 
-        if (e instanceof MethodArgumentNotValidException ex) {
+        if (e instanceof CustomClientException ex) {
+            error.status(ex.getStatus());
+            return new ResponseEntity<>(error.build(), ex.getStatus());
+        } else if (e instanceof MethodArgumentNotValidException ex) {
             List<String> missingParams = ex
                     .getBindingResult()
                     .getFieldErrors().stream()

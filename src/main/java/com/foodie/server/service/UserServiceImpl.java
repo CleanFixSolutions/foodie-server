@@ -1,9 +1,11 @@
 package com.foodie.server.service;
 
 import com.foodie.server.config.security.jwt.JwtService;
+import com.foodie.server.exception.custom.EmptyUserUpdateException;
 import com.foodie.server.exception.custom.UserNotFoundClientException;
 import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.dto.RecipeDto;
+import com.foodie.server.model.dto.UpdateUserDto;
 import com.foodie.server.model.dto.UserDto;
 import com.foodie.server.model.entity.UserEntity;
 import com.foodie.server.repository.UserRepository;
@@ -73,5 +75,27 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream()
                 .map(e -> modelMapper.map(e, UserDto.class))
                 .toList();
+    }
+
+    @Override
+    public JwtDto updateUser(UpdateUserDto updateUserDto) {
+        if (!updateUserDto.isUpdated()) {
+            throw new EmptyUserUpdateException("Nothing new to update");
+        }
+        log.info(updateUserDto.toString());
+        UserEntity user = userRepository.findByUsername(updateUserDto.getOldUsername())
+                .orElseThrow(() -> new UserNotFoundClientException(updateUserDto.getOldUsername()));
+
+        if (updateUserDto.getNewUsername() != null){
+            user.setUsername(updateUserDto.getNewUsername());
+        }
+        if (updateUserDto.getNewPassword() != null){
+            user.setPassword(passwordEncoder.encode((updateUserDto.getNewPassword())));
+        }
+        userRepository.save(user);
+        return JwtDto.builder()
+                .accessToken(jwtService.generateAccessToken(user.getUsername()))
+                .refreshToken(jwtService.generateRefreshToken(user.getUsername()))
+                .build();
     }
 }
