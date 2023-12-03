@@ -22,7 +22,7 @@ public class RecipeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "recipeJson")
+    @Column(name = "recipe_json")
     private String recipeBlocksJson;
 
 }

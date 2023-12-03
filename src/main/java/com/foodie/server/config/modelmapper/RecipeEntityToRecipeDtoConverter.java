@@ -24,7 +24,7 @@ public class RecipeEntityToRecipeDtoConverter implements Converter<RecipeEntity,
 
         return RecipeDto.builder()
                 .author(entity.getUser().getUsername())
-                .recipeBlockDtoList(recipeBlockDtos)
+                .recipeBlocks(recipeBlockDtos)
                 .build();
     }
 }

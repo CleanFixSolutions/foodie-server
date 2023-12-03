@@ -1,5 +1,7 @@
 package com.foodie.server.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -16,7 +18,9 @@ import java.util.List;
 public class RecipeDto {
 
     @NotEmpty
-    private List<@Valid RecipeBlockDto> recipeBlockDtoList;
+    @JsonProperty("recipe_blocks")
+    @JsonAlias(value = {"recipe_blocks", "blocks", "list"})
+    private List<@Valid RecipeBlockDto> recipeBlocks;
 
     private String author;
 

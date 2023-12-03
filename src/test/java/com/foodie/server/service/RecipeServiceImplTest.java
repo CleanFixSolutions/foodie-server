@@ -26,7 +26,7 @@ class RecipeServiceImplTest {
     private final static UserDto USER_DTO = new UserDto("name", "password");
     private static final RecipeBlockDto recipeBlock = new RecipeBlockDto(RecipeBlockType.TEXT, "Text");
     private static final RecipeDto RECIPE_DTO = RecipeDto.builder()
-            .recipeBlockDtoList(List.of(recipeBlock))
+            .recipeBlocks(List.of(recipeBlock))
             .author(USER_DTO.getUsername())
             .build();
 

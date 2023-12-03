@@ -27,7 +27,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void createRecipe(RecipeDto recipeDto) {
-        String jsonContext = gson.toJson(recipeDto.getRecipeBlockDtoList());
+        String jsonContext = gson.toJson(recipeDto.getRecipeBlocks());
 
         UserEntity user = userRepository.findByUsername(recipeDto.getAuthor())
                 .orElseThrow(() -> new UserNotFoundClientException(recipeDto.getAuthor()));
