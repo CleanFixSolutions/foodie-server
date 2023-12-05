@@ -46,6 +46,11 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
+    public String generateHeader(String token) {
+        return "Bearer " + token;
+    }
+
+    @Override
     public JwtDto refreshTokens(String authorizationHeader) {
         final String jwt = extractJwt(authorizationHeader);
         if (jwt == null) {

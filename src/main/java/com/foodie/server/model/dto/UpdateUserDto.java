@@ -22,14 +22,14 @@ public class UpdateUserDto {
 
     @Pattern(regexp = "[a-zA-Z0-9_-]{1,25}",
             message = "username must contain only letters, '_' or '-'. Max length=25")
-    @JsonProperty("password")
-    @JsonAlias(value = {"username", "name", "nickname", "user", "login"})
+    @JsonProperty("username")
+    @JsonAlias(value = {"name", "nickname", "user", "login"})
     @Schema(name = "username", example = "mishok")
     private String newUsername;
 
     @Size(min = 5, max = 25)
     @JsonProperty("password")
-    @JsonAlias(value = {"password", "new_password"})
+    @JsonAlias(value = {"new_password"})
     @Schema(name = "password", example = "12345")
     private String newPassword;
 

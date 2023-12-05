@@ -23,6 +23,14 @@ public interface JwtService {
     String generateRefreshToken(String username);
 
     /**
+     * Generates an Authorization header value for a given JWT token in the "Bearer" token format.
+     *
+     * @param token The JWT token for which to generate the Authorization header.
+     * @return The Authorization header value in the "Bearer" token format.
+     */
+    String generateHeader(String token);
+
+    /**
      * Refreshes "access" and "refresh" tokens based on the provided JWT in the Authorization header.
      *
      * @param authorizationHeader The authorization header containing the JWT.

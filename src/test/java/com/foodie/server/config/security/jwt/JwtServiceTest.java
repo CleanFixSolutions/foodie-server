@@ -1,7 +1,6 @@
 package com.foodie.server.config.security.jwt;
 
 import com.foodie.server.model.dto.JwtDto;
-import com.foodie.server.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,7 @@ class JwtServiceTest {
     @Test
     void refreshTokens() {
         String refreshToken = jwtService.generateRefreshToken(USERNAME_1);
-        JwtDto refreshedTokens = jwtService.refreshTokens("Bearer " + refreshToken);
+        JwtDto refreshedTokens = jwtService.refreshTokens(jwtService.generateHeader(refreshToken));
 
         Assertions.assertTrue(jwtService.isTokenValid(refreshedTokens.getAccessToken(), USERNAME_1));
         Assertions.assertFalse(jwtService.isTokenValid(refreshedTokens.getAccessToken(), USERNAME_1 + "text"));
@@ -59,8 +58,8 @@ class JwtServiceTest {
         final String accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJURVNUX1VTRVIiLCJpYXQiOjE3MDE1MTE1MTgsImV4cCI6MTcwMTU5NzkxOH0._-BD2fu5woTLfyny8og5R4ZEFgpuymu4l1_fBgjhXe4";
         final String refreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJURVNUX1VTRVIiLCJpYXQiOjE3MDE1MTE1MTgsImV4cCI6MTcwMjExNjMxOH0.YR1cC6CzyRwnAaxjTHStcLyz7J6dflrVP0ffuBYCrAQ";
 
-        Assertions.assertEquals(accessToken, jwtService.extractJwt("Bearer " + accessToken));
-        Assertions.assertEquals(refreshToken, jwtService.extractJwt("Bearer " + refreshToken));
+        Assertions.assertEquals(accessToken, jwtService.extractJwt(jwtService.generateHeader(accessToken)));
+        Assertions.assertEquals(refreshToken, jwtService.extractJwt(jwtService.generateHeader(refreshToken)));
     }
 
     @Test
@@ -68,8 +67,8 @@ class JwtServiceTest {
         String accessToken = jwtService.generateAccessToken(USERNAME_1);
         String refreshToken = jwtService.generateRefreshToken(USERNAME_1);
 
-        Assertions.assertEquals(accessToken, jwtService.extractJwt("Bearer " + accessToken));
-        Assertions.assertEquals(refreshToken, jwtService.extractJwt("Bearer " + refreshToken));
+        Assertions.assertEquals(accessToken, jwtService.extractJwt(jwtService.generateHeader(accessToken)));
+        Assertions.assertEquals(refreshToken, jwtService.extractJwt(jwtService.generateHeader(refreshToken)));
     }
 
     @Test
@@ -77,8 +76,15 @@ class JwtServiceTest {
         String accessToken = jwtService.generateAccessToken(USERNAME_1);
         String refreshToken = jwtService.generateRefreshToken(USERNAME_1);
 
-        Assertions.assertEquals(USERNAME_1, jwtService.extractUsername( accessToken));
-        Assertions.assertEquals(USERNAME_1, jwtService.extractUsername( refreshToken));
+        Assertions.assertEquals(USERNAME_1, jwtService.extractUsername(accessToken));
+        Assertions.assertEquals(USERNAME_1, jwtService.extractUsername(refreshToken));
     }
 
+    @Test
+    void generateHeader() {
+        String accessToken = jwtService.generateAccessToken(USERNAME_1);
+        String refreshToken = jwtService.generateRefreshToken(USERNAME_1);
+        Assertions.assertEquals("Bearer " + accessToken, jwtService.generateHeader(accessToken));
+        Assertions.assertEquals("Bearer " + refreshToken, jwtService.generateHeader(refreshToken));
+    }
 }
