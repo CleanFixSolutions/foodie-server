@@ -1,8 +1,10 @@
 package com.foodie.server.controller;
 
 import com.foodie.server.model.dto.JwtDto;
+import com.foodie.server.model.dto.ProfileResponseDto;
 import com.foodie.server.model.dto.RecipeDto;
-import com.foodie.server.model.dto.UpdateUserDto;
+import com.foodie.server.model.dto.UserUpdateRequestDto;
+import com.foodie.server.service.RecipeService;
 import com.foodie.server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,16 +22,22 @@ import java.util.List;
 public class ProfileController {
 
     private final UserService userService;
+    private final RecipeService recipeService;
 
     @GetMapping("/recipes")
-    public ResponseEntity<List<RecipeDto>> getRecipes(Authentication authentication) {
-        return ResponseEntity.ok(userService.getRecipesByUsername(authentication.getName()));
+    public ResponseEntity<List<RecipeDto>> getMyRecipes(Authentication authentication) {
+        return ResponseEntity.ok(recipeService.getRecipesByUsername(authentication.getName()));
+    }
+
+    @GetMapping
+    public ResponseEntity<ProfileResponseDto> getMyProfile(Authentication authentication) {
+        return ResponseEntity.ok(userService.getProfile(authentication.getName()));
     }
 
     @PutMapping
-    public ResponseEntity<JwtDto> updateProfile(@Valid @RequestBody UpdateUserDto updateUserDto, Authentication authentication) {
-        updateUserDto.setOldUsername(authentication.getName());
-        return ResponseEntity.ok().body(userService.updateUser(updateUserDto));
+    public ResponseEntity<JwtDto> updateProfile(@Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto, Authentication authentication) {
+        userUpdateRequestDto.setOldUsername(authentication.getName());
+        return ResponseEntity.ok().body(userService.updateUser(userUpdateRequestDto));
     }
 
     /**
@@ -45,7 +53,7 @@ public class ProfileController {
      * @return ResponseEntity with HTTP status 200 (OK) if the user account deletion is successful.
      */
     @DeleteMapping
-    public ResponseEntity<Void> delete(Authentication authentication) {
+    public ResponseEntity<Void> deleteMyProfile(Authentication authentication) {
         userService.delete(authentication.getName());
         return ResponseEntity.ok().build();
     }

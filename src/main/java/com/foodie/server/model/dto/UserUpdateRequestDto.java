@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserDto {
+public class UserUpdateRequestDto {
 
     @JsonIgnore
     private String oldUsername = "";

@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.util.Date;
 
 @Entity
 @Table(name = "recipes")
@@ -25,4 +29,11 @@ public class RecipeEntity {
     @Column(name = "recipe_json")
     private String recipeBlocksJson;
 
+    @Column(name = "creation_time")
+    @CreationTimestamp
+    private Date creationTime;
+
+    @Column(name = "last_modification_time")
+    @UpdateTimestamp
+    private Date lastModificationTime;
 }

@@ -4,9 +4,9 @@ import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.exception.custom.EmptyUserUpdateException;
 import com.foodie.server.exception.custom.UserNotFoundClientException;
 import com.foodie.server.model.dto.JwtDto;
-import com.foodie.server.model.dto.RecipeDto;
-import com.foodie.server.model.dto.UpdateUserDto;
+import com.foodie.server.model.dto.ProfileResponseDto;
 import com.foodie.server.model.dto.UserDto;
+import com.foodie.server.model.dto.UserUpdateRequestDto;
 import com.foodie.server.model.entity.UserEntity;
 import com.foodie.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,14 +62,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteByUsername(username);
     }
 
-    public List<RecipeDto> getRecipesByUsername(String username) {
-        UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundClientException(username));
-        return user.getRecipes().stream()
-                .map(recipe -> modelMapper.map(recipe, RecipeDto.class))
-                .toList();
-    }
-
     @Override
     public List<UserDto> getUsers() {
         return userRepository.findAll().stream()
@@ -78,19 +70,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public JwtDto updateUser(UpdateUserDto updateUserDto) {
-        if (!updateUserDto.isUpdated()) {
+    public ProfileResponseDto getProfile(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundClientException(username));
+        return modelMapper.map(user, ProfileResponseDto.class);
+    }
+
+    @Override
+    public JwtDto updateUser(UserUpdateRequestDto userUpdateRequestDto) {
+        if (!userUpdateRequestDto.isUpdated()) {
             throw new EmptyUserUpdateException("Nothing new to update");
         }
-        log.info(updateUserDto.toString());
-        UserEntity user = userRepository.findByUsername(updateUserDto.getOldUsername())
-                .orElseThrow(() -> new UserNotFoundClientException(updateUserDto.getOldUsername()));
+        log.info(userUpdateRequestDto.toString());
+        UserEntity user = userRepository.findByUsername(userUpdateRequestDto.getOldUsername())
+                .orElseThrow(() -> new UserNotFoundClientException(userUpdateRequestDto.getOldUsername()));
 
-        if (updateUserDto.getNewUsername() != null){
-            user.setUsername(updateUserDto.getNewUsername());
+        if (userUpdateRequestDto.getNewUsername() != null) {
+            user.setUsername(userUpdateRequestDto.getNewUsername());
         }
-        if (updateUserDto.getNewPassword() != null){
-            user.setPassword(passwordEncoder.encode((updateUserDto.getNewPassword())));
+        if (userUpdateRequestDto.getNewPassword() != null) {
+            user.setPassword(passwordEncoder.encode((userUpdateRequestDto.getNewPassword())));
         }
         userRepository.save(user);
         return JwtDto.builder()

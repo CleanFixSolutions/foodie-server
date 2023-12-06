@@ -1,7 +1,7 @@
 package com.foodie.server.service;
 
-import com.foodie.server.model.dto.UpdateUserDto;
 import com.foodie.server.model.dto.UserDto;
+import com.foodie.server.model.dto.UserUpdateRequestDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class ProfileTest {
     private UserService userService;
 
     private final static UserDto dto = new UserDto("test", "password");
-    private final static UpdateUserDto updateUserDto = UpdateUserDto.builder()
+    private final static UserUpdateRequestDto updateUserDto = UserUpdateRequestDto.builder()
             .oldUsername(dto.getUsername())
             .newUsername("new" + dto.getPassword())
             .newPassword("new" + dto.getPassword())

@@ -10,6 +10,8 @@ public interface RecipeService {
 
     List<RecipeDto> getAllRecipes();
 
+    List<RecipeDto> getRecipesByUsername(String username);
+
 //    List<RecipeEntity> getAllReceiptsByAuthor(String Author);
 
 }

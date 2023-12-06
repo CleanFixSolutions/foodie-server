@@ -41,8 +41,19 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public List<RecipeDto> getAllRecipes() {
-        return recipeRepository.findAll().stream()
-                .map(entity -> modelMapper.map(entity, RecipeDto.class))
+        return convert(recipeRepository.findAll());
+    }
+
+    @Override
+    public List<RecipeDto> getRecipesByUsername(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundClientException(username));
+        return convert(user.getRecipes());
+    }
+
+    private List<RecipeDto> convert(List<RecipeEntity> recipes) {
+        return recipes.stream()
+                .map(recipe -> modelMapper.map(recipe, RecipeDto.class))
                 .toList();
     }
 }

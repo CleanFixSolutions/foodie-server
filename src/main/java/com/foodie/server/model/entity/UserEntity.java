@@ -2,10 +2,13 @@ package com.foodie.server.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -30,6 +33,14 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<RecipeEntity> recipes;
+
+    @Column(name = "creation_time")
+    @CreationTimestamp
+    private Date creationTime;
+
+    @Column(name = "last_modification_time")
+    @UpdateTimestamp
+    private Date lastModificationTime;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

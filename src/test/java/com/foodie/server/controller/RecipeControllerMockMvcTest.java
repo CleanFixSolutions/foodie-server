@@ -76,7 +76,7 @@ class RecipeControllerMockMvcTest {
 
         // post recipe
         mockMvc.perform(post(RECIPE_URL)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken()))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken()))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(RECIPE_DTO)))
@@ -117,7 +117,7 @@ class RecipeControllerMockMvcTest {
         // get recipes
         mockMvc.perform(get(RECIPE_URL)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken())))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken())))
                 .andExpect(status().isOk());
     }
 
@@ -135,7 +135,7 @@ class RecipeControllerMockMvcTest {
 
         // post recipe
         mockMvc.perform(post(RECIPE_URL)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken()))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken()))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(RECIPE_DTO)))
@@ -144,7 +144,7 @@ class RecipeControllerMockMvcTest {
         // get recipes
         MvcResult getResult = mockMvc.perform(get(RECIPE_URL)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken())))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken())))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -166,19 +166,21 @@ class RecipeControllerMockMvcTest {
 
         // delete
         mockMvc.perform(delete(DELETE_USER_URL)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken())))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken())))
                 .andExpect(status().isOk());
 
         // post recipe
-        mockMvc.perform(get(RECIPE_URL)
+        mockMvc.perform(post(RECIPE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(RECIPE_DTO))
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken())))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken())))
                 .andExpect(status().is4xxClientError());
 
         // get recipes
         mockMvc.perform(get(RECIPE_URL)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken())))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken())))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -197,7 +199,7 @@ class RecipeControllerMockMvcTest {
         mockMvc.perform(post(RECIPE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken()))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken()))
                         .content(mapper.writeValueAsString(RECIPE_DTO)))
                 .andExpect(status().isOk());
 
@@ -206,7 +208,7 @@ class RecipeControllerMockMvcTest {
 
         // delete
         mockMvc.perform(delete(DELETE_USER_URL)
-                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getRefreshToken())))
+                        .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken())))
                 .andExpect(status().isOk());
 
         // check that repository is empty
