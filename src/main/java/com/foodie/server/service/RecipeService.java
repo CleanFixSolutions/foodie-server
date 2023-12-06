@@ -1,17 +1,19 @@
 package com.foodie.server.service;
 
 import com.foodie.server.model.dto.RecipeDto;
+import com.foodie.server.model.dto.RecipeResponseDto;
 
 import java.util.List;
 
 public interface RecipeService {
 
-    void createRecipe(RecipeDto recipeDto);
+    RecipeResponseDto createRecipe(RecipeDto recipeDto);
 
     List<RecipeDto> getAllRecipes();
 
     List<RecipeDto> getRecipesByUsername(String username);
 
-//    List<RecipeEntity> getAllReceiptsByAuthor(String Author);
+    RecipeResponseDto getRecipeByUsernameAndId(String username, Long id);
 
+    void deleteRecipeByUsernameAndId(String username, Long id);
 }

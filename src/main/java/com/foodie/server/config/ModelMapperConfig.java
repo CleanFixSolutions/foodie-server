@@ -1,6 +1,7 @@
 package com.foodie.server.config;
 
 import com.foodie.server.config.modelmapper.RecipeEntityToRecipeDtoConverter;
+import com.foodie.server.config.modelmapper.RecipeEntityToRecipeResponseDtoConverter;
 import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ public class ModelMapperConfig {
 
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new RecipeEntityToRecipeDtoConverter(gson));
+        modelMapper.addConverter(new RecipeEntityToRecipeResponseDtoConverter(gson));
         return modelMapper;
     }
 }
