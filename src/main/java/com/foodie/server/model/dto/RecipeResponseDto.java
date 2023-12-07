@@ -1,5 +1,6 @@
 package com.foodie.server.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -28,8 +29,10 @@ public class RecipeResponseDto {
     private List<@Valid RecipeBlockDto> recipeBlocks;
 
     @JsonProperty("creation_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date creationTime;
 
     @JsonProperty("last_modification_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date lastModificationTime;
 }

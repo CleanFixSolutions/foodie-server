@@ -2,8 +2,10 @@ package com.foodie.server.controller;
 
 
 import com.foodie.server.model.dto.RecipeDto;
+import com.foodie.server.model.dto.RecipeResponseDto;
 import com.foodie.server.service.RecipeService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,21 +23,21 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @PostMapping()
-    public ResponseEntity<Void> createRecipe(@Valid @RequestBody RecipeDto recipeDto, Authentication authentication) {
+    public ResponseEntity<RecipeResponseDto> createRecipe(Authentication authentication,
+                                                          @Valid @RequestBody RecipeDto recipeDto) {
         recipeDto.setAuthor(authentication.getName());
-        recipeService.createRecipe(recipeDto);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(recipeService.createRecipe(recipeDto));
     }
 
     @GetMapping()
-    public ResponseEntity<List<RecipeDto>> getAllRecipes() {
+    public ResponseEntity<List<RecipeResponseDto>> getAllRecipes() {
         return ResponseEntity.ok(recipeService.getAllRecipes());
     }
 
-//    @GetMapping("/{author}")
-//    public ResponseEntity<List<RecipeDto>> getAllReceipts(@PathVariable("author") @NotBlank String author) {
-//        return ResponseEntity.ok(recipeService.getAllReceiptsByAuthor(author));
-//    }
+    @GetMapping("/{author}")
+    public ResponseEntity<List<RecipeResponseDto>> getAllReceipts(@NotBlank @PathVariable("author") String author) {
+        return ResponseEntity.ok(recipeService.getRecipesByUsername(author));
+    }
 
 }
 

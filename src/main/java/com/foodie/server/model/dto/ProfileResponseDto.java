@@ -23,7 +23,7 @@ public class ProfileResponseDto {
 
     @JsonProperty("recipes")
     @Schema(name = "recipes")
-    private List<RecipeDto> recipes;
+    private List<RecipeResponseDto> recipes;
 
     @JsonProperty("creation_time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")

@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Instant;
@@ -48,8 +50,9 @@ class RecipeServiceImplTest {
     @Test
     void checkSavedContent() {
         recipeService.createRecipe(RECIPE_DTO);
-        RecipeDto dto = recipeService.getAllRecipes().get(0);
-        Assertions.assertEquals(RECIPE_DTO, dto);
+        RecipeResponseDto dto = recipeService.getAllRecipes().get(0);
+        Assertions.assertEquals(RECIPE_DTO.getAuthor(), dto.getAuthor());
+        Assertions.assertEquals(RECIPE_DTO.getRecipeBlocks(), dto.getRecipeBlocks());
     }
 
     @Test

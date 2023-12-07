@@ -9,7 +9,7 @@ public interface RecipeService {
 
     RecipeResponseDto createRecipe(RecipeDto recipeDto);
 
-    List<RecipeDto> getAllRecipes();
+    List<RecipeResponseDto> getAllRecipes();
 
     List<RecipeDto> getRecipesByUsername(String username);
 

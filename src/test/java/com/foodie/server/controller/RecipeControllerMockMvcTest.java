@@ -3,10 +3,7 @@ package com.foodie.server.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.model.RecipeBlockType;
-import com.foodie.server.model.dto.JwtDto;
-import com.foodie.server.model.dto.RecipeBlockDto;
-import com.foodie.server.model.dto.RecipeDto;
-import com.foodie.server.model.dto.UserDto;
+import com.foodie.server.model.dto.*;
 import com.foodie.server.repository.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -148,9 +145,10 @@ class RecipeControllerMockMvcTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        RecipeDto[] receivedRecipes = mapper.readValue(getResult.getResponse().getContentAsString(), RecipeDto[].class);
+        RecipeResponseDto[] receivedRecipes = mapper.readValue(getResult.getResponse().getContentAsString(), RecipeResponseDto[].class);
         Assertions.assertEquals(1, receivedRecipes.length);
-        Assertions.assertEquals(RECIPE_DTO, receivedRecipes[0]);
+        Assertions.assertEquals(RECIPE_DTO.getAuthor(), receivedRecipes[0].getAuthor());
+        Assertions.assertEquals(RECIPE_DTO.getRecipeBlocks(), receivedRecipes[0].getRecipeBlocks());
     }
 
     @Test

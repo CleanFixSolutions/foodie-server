@@ -1,6 +1,9 @@
 package com.foodie.server.controller;
 
-import com.foodie.server.model.dto.*;
+import com.foodie.server.model.dto.JwtDto;
+import com.foodie.server.model.dto.ProfileResponseDto;
+import com.foodie.server.model.dto.RecipeResponseDto;
+import com.foodie.server.model.dto.UserUpdateRequestDto;
 import com.foodie.server.service.RecipeService;
 import com.foodie.server.service.UserService;
 import jakarta.validation.Valid;
@@ -22,7 +25,7 @@ public class ProfileController {
     private final RecipeService recipeService;
 
     @GetMapping("/recipes")
-    public ResponseEntity<List<RecipeDto>> getMyRecipes(Authentication authentication) {
+    public ResponseEntity<List<RecipeResponseDto>> getMyRecipes(Authentication authentication) {
         return ResponseEntity.ok(recipeService.getRecipesByUsername(authentication.getName()));
     }
 
@@ -45,7 +48,8 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<JwtDto> updateProfile(@Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto, Authentication authentication) {
+    public ResponseEntity<JwtDto> updateProfile(Authentication authentication,
+                                                @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
         userUpdateRequestDto.setOldUsername(authentication.getName());
         return ResponseEntity.ok().body(userService.updateUser(userUpdateRequestDto));
     }

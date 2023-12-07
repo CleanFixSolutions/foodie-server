@@ -12,6 +12,8 @@ import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,12 +46,12 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public List<RecipeDto> getAllRecipes() {
+    public List<RecipeResponseDto> getAllRecipes() {
         return convert(recipeRepository.findAll());
     }
 
     @Override
-    public List<RecipeDto> getRecipesByUsername(String username) {
+    public List<RecipeResponseDto> getRecipesByUsername(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundClientException(username));
         return convert(user.getRecipes());
@@ -73,9 +75,9 @@ public class RecipeServiceImpl implements RecipeService {
         recipeRepository.deleteById(id);
     }
 
-    private List<RecipeDto> convert(List<RecipeEntity> recipes) {
+    private List<RecipeResponseDto> convert(List<RecipeEntity> recipes) {
         return recipes.stream()
-                .map(recipe -> modelMapper.map(recipe, RecipeDto.class))
+                .map(recipe -> modelMapper.map(recipe, RecipeResponseDto.class))
                 .toList();
     }
 }
