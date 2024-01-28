@@ -1,5 +1,6 @@
 package com.foodie.server.service;
 
+import com.foodie.server.BaseConfigTest;
 import com.foodie.server.model.RecipeBlockType;
 import com.foodie.server.model.dto.RecipeBlockDto;
 import com.foodie.server.model.dto.RecipeDto;
@@ -9,18 +10,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class RecipeServiceImplTest {
+class RecipeServiceImplTest extends BaseConfigTest {
 
     @Autowired
     private RecipeService recipeService;
@@ -76,6 +73,34 @@ class RecipeServiceImplTest {
         Assertions.assertEquals(1, recipeService.getAllRecipes().size());
         recipeService.deleteRecipeByUsernameAndId(createDto.getAuthor(), createDto.getId());
         Assertions.assertEquals(0, recipeService.getAllRecipes().size());
+    }
+
+    @Test
+    void getAllRecipesPageable1() {
+        Page<RecipeResponseDto> emptyRecipes = recipeService.getAllRecipes(PageRequest.of(0, 5));
+        Assertions.assertEquals(0, emptyRecipes.getTotalPages());
+        Assertions.assertEquals(0, emptyRecipes.getTotalElements());
+
+        RecipeResponseDto createDto = recipeService.createRecipe(RECIPE_DTO);
+        Assertions.assertEquals(1, recipeService.getAllRecipes().size());
+
+        Page<RecipeResponseDto> allRecipes = recipeService.getAllRecipes(PageRequest.of(0, 5));
+        Assertions.assertEquals(1, allRecipes.getTotalPages());
+        Assertions.assertEquals(1, allRecipes.getTotalElements());
+        Assertions.assertEquals(createDto, allRecipes.getContent().get(0));
+    }
+
+    @Test
+    void getAllRecipesPageable3() {
+        Assertions.assertEquals(0, recipeService.getAllRecipes().size());
+        recipeService.createRecipe(RECIPE_DTO);
+        recipeService.createRecipe(RECIPE_DTO);
+        recipeService.createRecipe(RECIPE_DTO);
+        Assertions.assertEquals(3, recipeService.getAllRecipes().size());
+
+        Page<RecipeResponseDto> allRecipes = recipeService.getAllRecipes(PageRequest.of(0, 5));
+        Assertions.assertEquals(1, allRecipes.getTotalPages());
+        Assertions.assertEquals(3, allRecipes.getTotalElements());
     }
 
 }

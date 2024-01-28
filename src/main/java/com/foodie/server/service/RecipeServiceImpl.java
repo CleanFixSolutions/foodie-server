@@ -45,9 +45,16 @@ public class RecipeServiceImpl implements RecipeService {
         return modelMapper.map(saved, RecipeResponseDto.class);
     }
 
+    @Deprecated
     @Override
     public List<RecipeResponseDto> getAllRecipes() {
         return convert(recipeRepository.findAll());
+    }
+
+    @Override
+    public Page<RecipeResponseDto> getAllRecipes(Pageable pageable) {
+        return recipeRepository.findAll(pageable)
+                .map(recipe -> modelMapper.map(recipe, RecipeResponseDto.class));
     }
 
     @Override

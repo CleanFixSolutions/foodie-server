@@ -1,17 +1,14 @@
 package com.foodie.server.service;
 
+import com.foodie.server.BaseConfigTest;
 import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.dto.UserDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class UserServiceImplTest {
+class UserServiceImplTest extends BaseConfigTest {
 
     @Autowired
     private UserService userService;

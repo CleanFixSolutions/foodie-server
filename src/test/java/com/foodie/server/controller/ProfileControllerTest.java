@@ -1,20 +1,16 @@
 package com.foodie.server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foodie.server.BaseConfigTest;
 import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.model.RecipeBlockType;
 import com.foodie.server.model.dto.*;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -25,12 +21,8 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Slf4j
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestMethodOrder(MethodOrderer.MethodName.class)
 @AutoConfigureMockMvc
-class ProfileControllerTest {
+class ProfileControllerTest extends BaseConfigTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -191,7 +183,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void deleteWithtAuth() throws Exception {
+    void deleteWithAuth() throws Exception {
         // register
         MvcResult registerResult = mockMvc.perform(post(REGISTER_URL)
                         .contentType(MediaType.APPLICATION_JSON)

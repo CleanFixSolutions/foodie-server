@@ -1,10 +1,12 @@
 package com.foodie.server.controller;
 
+import com.foodie.server.BaseConfigTest;
 import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.model.dto.JwtDto;
 import com.foodie.server.model.dto.UserDto;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -13,18 +15,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestMethodOrder(MethodOrderer.MethodName.class)
-public class AuthControllerRestTemplateTest {
+public class AuthControllerRestTemplateTest extends BaseConfigTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -60,8 +57,6 @@ public class AuthControllerRestTemplateTest {
     @Test
     void register() {
         ResponseEntity<JwtDto> registerExchange = restTemplate.exchange(new RequestEntity<>(USER_DTO, HttpMethod.POST, getRegisterUrl()), JwtDto.class);
-
-        log.info(registerExchange.toString());
 
         Assertions.assertTrue(registerExchange.getStatusCode().is2xxSuccessful());
         Assertions.assertTrue(jwtService.isTokenValid(registerExchange.getBody().getAccessToken(), USER_DTO.getUsername()));

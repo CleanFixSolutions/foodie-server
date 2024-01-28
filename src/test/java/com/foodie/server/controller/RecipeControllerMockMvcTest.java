@@ -1,20 +1,24 @@
 package com.foodie.server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foodie.server.BaseConfigTest;
 import com.foodie.server.config.security.jwt.JwtService;
 import com.foodie.server.model.RecipeBlockType;
-import com.foodie.server.model.dto.*;
+import com.foodie.server.model.dto.JwtDto;
+import com.foodie.server.model.dto.RecipeBlockDto;
+import com.foodie.server.model.dto.RecipeDto;
+import com.foodie.server.model.dto.UserDto;
 import com.foodie.server.repository.RecipeRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
@@ -22,12 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Slf4j
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestMethodOrder(MethodOrderer.MethodName.class)
 @AutoConfigureMockMvc
-class RecipeControllerMockMvcTest {
+class RecipeControllerMockMvcTest extends BaseConfigTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -139,16 +139,15 @@ class RecipeControllerMockMvcTest {
                 .andExpect(status().isOk());
 
         // get recipes
-        MvcResult getResult = mockMvc.perform(get(RECIPE_URL)
+        mockMvc.perform(get(RECIPE_URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, jwtService.generateHeader(registerJwt.getAccessToken())))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        RecipeResponseDto[] receivedRecipes = mapper.readValue(getResult.getResponse().getContentAsString(), RecipeResponseDto[].class);
-        Assertions.assertEquals(1, receivedRecipes.length);
-        Assertions.assertEquals(RECIPE_DTO.getAuthor(), receivedRecipes[0].getAuthor());
-        Assertions.assertEquals(RECIPE_DTO.getRecipeBlocks(), receivedRecipes[0].getRecipeBlocks());
+                .andExpect(MockMvcResultMatchers.jsonPath("$..author").value(RECIPE_DTO.getAuthor()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$..recipe_blocks[0].content")
+                        .value(RECIPE_DTO.getRecipeBlocks().get(0).getContent()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$..recipe_blocks[0].block_type")
+                        .value(RECIPE_DTO.getRecipeBlocks().get(0).getBlockType().name()));
     }
 
     @Test

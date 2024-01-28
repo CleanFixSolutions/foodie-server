@@ -1,27 +1,17 @@
 package com.foodie.server.config.security.jwt;
 
+import com.foodie.server.BaseConfigTest;
 import com.foodie.server.model.dto.JwtDto;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 
-@Slf4j
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class JwtServiceTest {
+class JwtServiceTest extends BaseConfigTest {
 
     @Autowired
     private JwtService jwtService;
 
     private static final String USERNAME_1 = "TEST_USER";
-
-//    private final static UserEntity USER_ENTITY_1 = UserEntity.builder()
-//            .username(USERNAME_1)
-//            .password("TEST_PASSWORD")
-//            .build();
 
     @Test
     void generateToken() {
